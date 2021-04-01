@@ -7,6 +7,8 @@ Then, you should be able to compile and upload this to any BDN9 Rev. 2 using ```
 
 For muting/unmuting, you can take the AutoHotkey V2 scripts from here: https://github.com/alexzhou00/ahk/tree/main. Note that these do not work with AutoHotkey V1 (the default installation at time of writing \[4/1/2021\]).
 
+## Documentation
+Keymapping: https://docs.google.com/spreadsheets/d/113ezfiWuT76fybsH2GwZeazhtU_OuRjdXRp3At457Ek/edit#gid=0
+
 ## TODO
 * Update keymap comments in C code.
-* Upload keymap Google sheet
