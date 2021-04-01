@@ -182,43 +182,67 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 void encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == _LEFT) {
-        if (clockwise) {
-            tap_code16(LWIN(KC_EQUAL));
-        } else {
-            tap_code16(LWIN(KC_MINUS));
+    if (layer == 0) {
+        if (index == _LEFT) {
+            if (clockwise) {
+                tap_code16(LWIN(KC_EQUAL));
+            } else {
+                tap_code16(LWIN(KC_MINUS));
+            }
         }
-    }
-    else if (index == _MIDDLE) {
-        if (clockwise) {
-            tap_code(KC_F13);
-        } else {
-            tap_code(KC_F14);
+        else if (index == _MIDDLE) {
+            if (clockwise) {
+                tap_code(KC_F14);
+            } else {
+                tap_code(KC_F13);
+            }
         }
-    }
-    else if (index == _RIGHT) {
-        if (clockwise) {
-            tap_code(KC_VOLU);
-        } else {
-            tap_code(KC_VOLD);
+        else if (index == _RIGHT) {
+            if (clockwise) {
+                tap_code(KC_VOLU);
+            } else {
+                tap_code(KC_VOLD);
+            }
+        }
+    } else if (layer == 1) {
+        if (index == _LEFT) {
+            if (clockwise) {
+                tap_code(KC_F14);
+            } else {
+                tap_code(KC_F13);
+            }
+        }
+        else if (index == _MIDDLE) {
+            if (clockwise) {
+                tap_code(KC_F16);
+            } else {
+                tap_code(KC_F15);
+            }
+        }
+        else if (index == _RIGHT) {
+            if (clockwise) {
+                tap_code(KC_F18);
+            } else {
+                tap_code(KC_F17);
+            }
         }
     }
 }
 
 void rgb_matrix_indicators_user(void) {
     if (layer == 1) {
-        if (group_ctrl) {
-            rgb_matrix_sethsv(127, 255, 100);
-        } else if (preset_ctrl) {
-            rgb_matrix_sethsv(201, 255, 100);
+        if (lightmode == 0) {
+            rgb_matrix_sethsv(43, 255, 100);
+        } else if (lightmode == 1) {
+            rgb_matrix_sethsv(0, 255, 100);
         } else {
-            if (lightmode == 0) {
-                rgb_matrix_sethsv(43, 255, 100);
-            } else if (lightmode == 1) {
-                rgb_matrix_sethsv(0, 255, 100);
-            } else {
-                rgb_matrix_sethsv(85, 255, 100);
-            }
+            rgb_matrix_sethsv(85, 255, 100);
+        }
+
+        if (group_ctrl) {
+            rgb_matrix_set_color(8, 0, 100, 100);
+        } else if (preset_ctrl) {
+            rgb_matrix_set_color(8, 100, 0, 100);
         }
 
         for (int i = 0; i < 5; i++) {
