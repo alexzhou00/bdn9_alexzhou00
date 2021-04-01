@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "..\\..\\..\\..\\.."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "quantum.h": "c",
+            "*.inc": "c"
+        }
+    }
+}
