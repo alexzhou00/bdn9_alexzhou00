@@ -21,6 +21,8 @@ static bool preset_ctrl = false;
 static bool active_groups[5] = {true, false, false, false, false};
 static int lightmode = 0;
 static int layer = 0;
+static int per_key_brightness = 80;
+static int backlight_brightness = 120;
 
 enum custom_keycodes {
     START_LIGHTING = SAFE_RANGE,
@@ -159,10 +161,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
-        | Knob 1: Vol Dn/Up |      | Knob 2: Page Dn/Up |
-        | Press: Mute       | Home | Press: Play/Pause  |
-        | Hold: Layer 2     | Up   | RGB Mode           |
-        | Left              | Down | Right              |
+        | Knob 1: Win +/-   | Knob 2: Light up/down | Knob 2: Vol Dn/Up  |
+        | Press: Win Esc    | Press: Start lighting | Press: Mute Audio  |
+        | Backspace         | F16                   | Mute Mic           |
+        | Copy              | Paste                 | Enter              |
      */
     [0] = LAYOUT(
         LWIN(KC_ESCAPE), START_LIGHTING, KC_MUTE,
@@ -170,9 +172,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         LCTL(KC_C), LCTL(KC_V), KC_ENTER
     ),
     /*
-        | RESET          | N/A  | Media Stop |
-        | Held: Layer 2  | Home | RGB Mode   |
-        | Media Previous | End  | Media Next |
+        See documentation: https://bit.ly/3mgXvci
      */
     [1] = LAYOUT(
         ENCODER1, ENCODER2, ENCODER3,
@@ -229,40 +229,57 @@ void encoder_update_user(uint8_t index, bool clockwise) {
     }
 }
 
+RGB rgb_matrix_hsv_to_rgb(HSV hsv) { return hsv_to_rgb(hsv); }
+
 void rgb_matrix_indicators_user(void) {
     if (layer == 1) {
+        HSV hsv;
+        hsv.s = 255;
         if (lightmode == 0) {
-            rgb_matrix_sethsv(43, 255, 100);
+            hsv.h = 43;
+            rgb_matrix_sethsv(43, 255, backlight_brightness);
         } else if (lightmode == 1) {
-            rgb_matrix_sethsv(0, 255, 100);
+            hsv.h = 0;
+            rgb_matrix_sethsv(0, 255, backlight_brightness);
         } else {
-            rgb_matrix_sethsv(85, 255, 100);
+            hsv.h = 85;
+            rgb_matrix_sethsv(85, 255, backlight_brightness);
         }
+        rgb_matrix_sethsv(hsv.h, hsv.s, backlight_brightness);
 
+        hsv.v = per_key_brightness;
+        RGB rgb = rgb_matrix_hsv_to_rgb(hsv);
+        for (int i = 0; i < 9; i++) {
+            rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+        }
         if (group_ctrl) {
-            rgb_matrix_set_color(8, 0, 100, 100);
+            rgb_matrix_set_color(8, 0, per_key_brightness, per_key_brightness);
         } else if (preset_ctrl) {
-            rgb_matrix_set_color(8, 100, 0, 100);
+            rgb_matrix_set_color(8, per_key_brightness, 0, per_key_brightness);
         }
 
         for (int i = 0; i < 5; i++) {
             if (active_groups[i]) {
-                rgb_matrix_set_color(i+3, 100, 100, 0);
+                rgb_matrix_set_color(i+3, per_key_brightness, per_key_brightness, 0);
             } else {
                 rgb_matrix_set_color(i+3, 0, 0, 0);
             }
         }
     } else {
         rgb_matrix_sethsv(128, 255, 100);
+        HSV per_key_hsv = { .h = 128, .s = 255, .v = per_key_brightness };
+        RGB per_key_rgb = rgb_matrix_hsv_to_rgb(per_key_hsv);
+        for (int i = 0; i < 9; i++) {
+            rgb_matrix_set_color(i, per_key_rgb.r, per_key_rgb.g, per_key_rgb.b);
+        }
         if (muted) {
-            rgb_matrix_set_color(5, 100, 0, 0);
+            rgb_matrix_set_color(5, per_key_brightness, 0, 0);
         }
     }
+
 }
 
 void matrix_init_user(void) {
-    // rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_enable();
     rgb_matrix_mode(RGB_MATRIX_NONE);
-    rgb_matrix_sethsv(128, 255, 100);
 }
